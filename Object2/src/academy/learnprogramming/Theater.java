@@ -8,14 +8,6 @@ public class Theater {
     }
 
     public void enter(Audience audience) {
-        if (audience.getBag().hasInvitation()) {
-            Ticket ticket = ticketSeller.getTicketOffice().geTicket();
-            audience.getBag().setTicket(ticket);
-        } else {
-            Ticket ticket = ticketSeller.getTicketOffice().geTicket();
-            audience.getBag().minusAmount(ticket.getFee());
-            ticketSeller.getTicketOffice().plusAmount(ticket.getFee());
-            audience.getBag().setTicket(ticket);
-        }
+        ticketSeller.sellTo(audience);
     }
 }
