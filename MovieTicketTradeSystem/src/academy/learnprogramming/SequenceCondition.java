@@ -1,6 +1,6 @@
 package academy.learnprogramming;
 
-public class SequenceCondition implements DiscountPolicy {
+public class SequenceCondition implements DiscountCondition {
     private int sequence;
 
     public SequenceCondition(int sequence) {
