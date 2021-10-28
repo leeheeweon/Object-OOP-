@@ -16,47 +16,41 @@ public class Movie {
     private double discountPercent;
 
 
-    public MovieType getMovieType() {
-        return movieType;
-    }
-
-    public Money calculateAmountDiscountedFee() {
-        if (movieType != MovieType.AMOUNT_DISCOUNT) {
-            throw new IllegalArgumentException();
+    private Money calculateDiscountAmount() {
+        switch (movieType) {
+            case AMOUNT_DISCOUNT:
+                return calculateAmountDiscountAmount();
+            case PERCENT_DISCOUNT:
+                return calculatePercentDiscountAmount();
+            case NONE_DISCOUNT:
+                return calculateNoneDiscountAmount();
         }
 
-        return fee.minus(discountAmount);
+        throw new IllegalStateException();
     }
 
-    public Money calculatePercentDiscountedFee() {
-        if (movieType != MovieType.PERCENT_DISCOUNT) {
-            throw new IllegalArgumentException();
-        }
-
-        return fee.minus(fee.times(discountPercent));
+    private Money calculateAmountDiscountAmount() {
+        return discountAmount;
     }
 
-    public Money calculateNoneDiscountedFee() {
-        if (movieType != MovieType.NONE_DISCOUNT) {
-            throw new IllegalArgumentException();
+    private Money calculatePercentDiscountAmount() {
+        return fee.times(discountPercent);
+    }
+
+    private Money calculateNoneDiscountAmount() {
+        return Money.ZERO;
+    }
+
+    public Money calculateMovieFee(Screening screening) {
+        if (isDiscountable(screening)) {
+            return fee.minus(calculateDiscountAmount());
         }
 
         return fee;
     }
 
-    public boolean isDiscountable(LocalDateTime whenScreened, int sequence) {
-        for (DiscountCondition condition : discountConditions) {
-            if (condition.getType() == DiscountConditionType.PERIOD) {
-                if (condition.isDiscountable(whenScreened.getDayOfWeek(), whenScreened.toLocalTime())) {
-                    return true;
-                }
-            } else {
-                if (condition.isDiscountable(sequence)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    private boolean isDiscountable(LocalDateTime whenScreened, int sequence) {
+        return discountConditions.stream().anyMatch(condition -> condition.isSatisfiedBy(sequence));
     }
 }
 
