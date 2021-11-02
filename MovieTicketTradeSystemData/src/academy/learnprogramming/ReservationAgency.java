@@ -7,27 +7,13 @@ public class ReservationAgency {
         return createReservation(screening, customer, audienceCount, fee);
     }
 
-    private boolean chekDiscountable(Screening screening) {
-        return screening.getMovie().getDiscountConditions().stream().anyMatch(condition -> isDiscountable(condition, screening));
+    private boolean checkDiscountable(Screening screening) {
+        return screening.getMovie().getDiscountConditions().stream().anyMatch(condition -> condition.isDiscountable(screening));
     }
 
-    private boolean isDiscountable(DiscountCondition condition, Screening screening) {
-        if (condition.getType() == DiscountConditionType.PERIOD) {
-            return isSatisfiedByPeriod(condition, screening);
-        }
 
-        return isSatisfiedBySequence(condition, screening);
-    }
 
-    private boolean isSatisfiedByPeriod(DiscountCondition condition, Screening screening) {
-        return screening.getWhenScreened().getDayOfWeek().equals(condition.getDayOfWeek()) &&
-                condition.getStartTime().compareTo(screening.getWhenScreened().toLocalTime()) <= 0 &&
-                condition.getEndTime().compareTo(screening.getWhenScreened().toLocalTime()) >= 0;
-    }
 
-    private boolean isSatisfiedBySequence(DiscountCondition condition, Screening screening) {
-        return condition.getSequence() == screening.getSequence();
-    }
 
     private Money calculateFee(Screening screening, boolean discountable, int audienceCount) {
         if (discountable) {
